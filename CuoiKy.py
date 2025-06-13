@@ -1,17 +1,49 @@
-# --- Hàm 1: Khởi tạo từ điển môn học ---
+# ===================================================================
+# PHẦN ĐỊNH NGHĨA CÁC LỚP (Sử dụng cho Câu 2)
+# ===================================================================
+
+class Nguoi:
+    """Lớp cha chứa các thông tin cơ bản về một người."""
+    def __init__(self, ho_ten, ngay_sinh, dia_chi):
+        self.ho_ten = ho_ten
+        self.ngay_sinh = ngay_sinh
+        self.dia_chi = dia_chi
+        
+    def __str__(self):
+        return f"Họ tên: {self.ho_ten}, Ngày sinh: {self.ngay_sinh}, Địa chỉ: {self.dia_chi}"
+
+class GiaoVien(Nguoi):
+    """Lớp con GiaoVien kế thừa từ Nguoi, có thêm thông tin chuyên môn."""
+    def __init__(self, ho_ten, ngay_sinh, dia_chi, mon_day, trinh_do, so_nam_cong_tac):
+        super().__init__(ho_ten, ngay_sinh, dia_chi)
+        self.mon_day = mon_day
+        self.trinh_do = trinh_do
+        self.so_nam_cong_tac = so_nam_cong_tac
+
+    def __str__(self):
+        thong_tin_cha = super().__str__()
+        thong_tin_con = f", Môn dạy: {self.mon_day}, Trình độ: {self.trinh_do}, Số năm công tác: {self.so_nam_cong_tac}"
+        return thong_tin_cha + thong_tin_con
+        
+    def __lt__(self, other):
+        """Nạp chồng toán tử '<' để sắp xếp GiaoVien theo số năm công tác."""
+        return self.so_nam_cong_tac < other.so_nam_cong_tac
+
+# ===================================================================
+# PHẦN ĐỊNH NGHĨA CÁC HÀM (Sử dụng cho Câu 1)
+# ===================================================================
+
 def khoi_tao_mon_hoc():
+    """Hàm khởi tạo từ điển chứa thông tin các môn học."""
     while True:
         try:
-            # Xử lý nhập liệu, đảm bảo n là số nguyên và >= 5
             n = int(input("Nhập số lượng môn học (n >= 5): "))
-            if n >= 5:
-                break
-            else:
-                print("Số lượng môn học phải lớn hơn hoặc bằng 5. Vui lòng nhập lại.")
+            if n >= 5: break
+            else: print("Số lượng môn học phải lớn hơn hoặc bằng 5.")
         except ValueError:
             print("Vui lòng nhập một số nguyên.")
 
-    ds_mon = {} # Khởi tạo một từ điển rỗng
+    ds_mon = {}
     print("-" * 20)
     for i in range(n):
         print(f"Nhập thông tin cho môn học thứ {i + 1}:")
@@ -20,147 +52,85 @@ def khoi_tao_mon_hoc():
         so_tin_chi = int(input(" - Số tín chỉ: "))
         hoc_ky = input(" - Học kỳ: ")
         giang_vien = input(" - Giảng viên: ")
-        
-        # Thêm một cặp key-value mới vào từ điển
         ds_mon[ma_mon] = [ten_mon, so_tin_chi, hoc_ky, giang_vien]
         print("-" * 10)
-        
     return ds_mon
 
-# --- Hàm 2: Nhập số lượng đăng ký ---
 def nhap_so_dang_ky(ma_mon, ds_mon):
+    """Hàm nhập số lượng sinh viên đăng ký cho một môn học."""
     if ma_mon in ds_mon:
-        so_luong = int(input(f"Nhập số lượng sinh viên đăng ký môn '{ma_mon}': "))
-        # Thêm số lượng vào cuối danh sách của môn học tương ứng
-        ds_mon[ma_mon].append(so_luong)
-        print("Cập nhật thành công!")
+        so_luong = int(input(f"Nhập số lượng SV đăng ký môn '{ma_mon}': "))
+        if len(ds_mon[ma_mon]) == 4: # Chỉ thêm nếu chưa có
+            ds_mon[ma_mon].append(so_luong)
+            print("Cập nhật thành công!")
+        else:
+            print("Môn này đã có thông tin đăng ký.")
     else:
         print(f"Lỗi: Không tìm thấy môn học có mã '{ma_mon}'.")
 
-# --- Hàm 3: Kiểm tra môn học đã có số lượng đăng ký chưa ---
 def kiem_tra_dang_ky(ma_mon, ds_mon):
-    if ma_mon in ds_mon:
-        # Nếu danh sách có 5 phần tử, nghĩa là đã nhập số lượng
-        if len(ds_mon[ma_mon]) == 5:
-            print(f"Môn học '{ma_mon}' ĐÃ CÓ thông tin đăng ký.")
-            return True
-        else:
-            print(f"Môn học '{ma_mon}' CHƯA CÓ thông tin đăng ký.")
-            return False
+    """Hàm kiểm tra một môn học đã có dữ liệu đăng ký hay chưa."""
+    if ma_mon in ds_mon and len(ds_mon[ma_mon]) == 5:
+        print(f"Môn học '{ma_mon}' ĐÃ CÓ thông tin đăng ký.")
+        return True
     else:
-        print(f"Lỗi: Không tìm thấy môn học có mã '{ma_mon}'.")
+        print(f"Môn học '{ma_mon}' CHƯA CÓ thông tin đăng ký.")
         return False
 
-# --- Khối lệnh chính để thực thi ---
+# ===================================================================
+# KHỐI LỆNH CHÍNH (MAIN)
+# ===================================================================
+
 if __name__ == "__main__":
-    # 1. Xây dựng danh sách môn học
+    
+    # --- Bắt đầu thực thi yêu cầu Câu 1 ---
+    print("="*15, "PHẦN 1: QUẢN LÝ MÔN HỌC (CÂU 1)", "="*15)
+    
     danh_sach_mon_hoc = khoi_tao_mon_hoc()
-    print("\nDANH SÁCH MÔN HỌC ĐÃ TẠO:")
+    print("\nDANH SÁCH MÔN HỌC BAN ĐẦU:")
     print(danh_sach_mon_hoc)
     
-    # 2. Bổ sung thông tin đăng ký (ví dụ cho một môn)
     ma_can_nhap = input("\nNhập mã môn bạn muốn bổ sung số lượng đăng ký: ")
     nhap_so_dang_ky(ma_can_nhap, danh_sach_mon_hoc)
     
-    # 3. Kiểm tra lại môn vừa nhập
-    kiem_tra_dang_ky(ma_can_nhap, danh_sach_mon_hoc)
-
-    # 4. Tính và in tổng số lượt đăng ký
-    tong_so_luot_dang_ky = 0
-    # Duyệt qua các giá trị (là các list) trong từ điển
-    for mon_hoc_info in danh_sach_mon_hoc.values():
-        # Nếu môn học đã có thông tin đăng ký (danh sách có 5 phần tử)
-        if len(mon_hoc_info) == 5:
-            # Cộng dồn số lượng đăng ký (phần tử thứ 5, chỉ số 4)
-            tong_so_luot_dang_ky += mon_hoc_info[4]
-            
+    tong_so_luot_dang_ky = sum(mon[4] for mon in danh_sach_mon_hoc.values() if len(mon) == 5)
     print(f"\nTổng số lượt đăng ký của tất cả các môn là: {tong_so_luot_dang_ky}")
-    # Câu 2 -------------------------------------
-
-# --- Lớp cha: Nguoi ---
-class Nguoi:
-    # Hàm khởi tạo của lớp Nguoi
-    def __init__(self, ho_ten, ngay_sinh, dia_chi):
-        self.ho_ten = ho_ten
-        self.ngay_sinh = ngay_sinh
-        self.dia_chi = dia_chi
-        
-    # Phương thức để hiển thị thông tin, giúp in ra đẹp hơn
-    def __str__(self):
-        return f"Họ tên: {self.ho_ten}, Ngày sinh: {self.ngay_sinh}, Địa chỉ: {self.dia_chi}"
-
-# --- Lớp con: GiaoVien, kế thừa từ Nguoi ---
-class GiaoVien(Nguoi):
-    # Hàm khởi tạo của lớp GiaoVien
-    def __init__(self, ho_ten, ngay_sinh, dia_chi, mon_day, trinh_do, so_nam_cong_tac):
-        # Gọi hàm khởi tạo của lớp cha (Nguoi) để không phải viết lại code
-        super().__init__(ho_ten, ngay_sinh, dia_chi)
-        # Thêm các thuộc tính riêng của GiaoVien
-        self.mon_day = mon_day
-        self.trinh_do = trinh_do
-        self.so_nam_cong_tac = so_nam_cong_tac
-
-    # Nạp chồng phương thức __str__ để thêm thông tin của GiaoVien
-    def __str__(self):
-        # Lấy chuỗi thông tin cơ bản từ lớp cha
-        thong_tin_cha = super().__str__()
-        # Nối thêm thông tin riêng
-        thong_tin_con = f", Môn dạy: {self.mon_day}, Trình độ: {self.trinh_do}, Số năm công tác: {self.so_nam_cong_tac}"
-        return thong_tin_cha + thong_tin_con
-        
-    # --- Nạp chồng toán tử so sánh '<' (less than) ---
-    # Python sẽ dùng phương thức này khi so sánh hai đối tượng GiaoVien
-    def __lt__(self, other):
-        # So sánh dựa trên số năm công tác
-        return self.so_nam_cong_tac < other.so_nam_cong_tac
-
-# --- Khối lệnh chính để thực thi ---
-if __name__ == "__main__":
-    danh_sach_giao_vien = []
     
+    # --- Bắt đầu thực thi yêu cầu Câu 2 ---
+    print("\n\n" + "="*15, "PHẦN 2: QUẢN LÝ GIÁO VIÊN (CÂU 2)", "="*15)
+    
+    danh_sach_giao_vien = []
     while True:
         try:
-            n = int(input("Nhập số lượng giáo viên (n > 3): "))
-            if n > 3:
-                break
-            else:
-                print("Số lượng giáo viên phải lớn hơn 3. Vui lòng nhập lại.")
+            n_gv = int(input("Nhập số lượng giáo viên (n > 3): "))
+            if n_gv > 3: break
+            else: print("Số lượng giáo viên phải lớn hơn 3.")
         except ValueError:
             print("Vui lòng nhập một số nguyên.")
 
     print("-" * 20)
-    for i in range(n):
+    for i in range(n_gv):
         print(f"Nhập thông tin cho giáo viên thứ {i + 1}:")
-        ho_ten = input(" - Họ tên: ")
-        ngay_sinh = input(" - Ngày sinh: ")
-        dia_chi = input(" - Địa chỉ: ")
-        mon_day = input(" - Môn dạy: ")
-        trinh_do = input(" - Trình độ: ")
-        so_nam_cong_tac = int(input(" - Số năm công tác: "))
-        
-        # Tạo một đối tượng (instance) của lớp GiaoVien
-        giao_vien = GiaoVien(ho_ten, ngay_sinh, dia_chi, mon_day, trinh_do, so_nam_cong_tac)
-        
-        # Thêm đối tượng vừa tạo vào danh sách
-        danh_sach_giao_vien.append(giao_vien)
+        gv = GiaoVien(ho_ten=input(" - Họ tên: "),
+                      ngay_sinh=input(" - Ngày sinh: "),
+                      dia_chi=input(" - Địa chỉ: "),
+                      mon_day=input(" - Môn dạy: "),
+                      trinh_do=input(" - Trình độ: "),
+                      so_nam_cong_tac=int(input(" - Số năm công tác: ")))
+        danh_sach_giao_vien.append(gv)
         print("-" * 10)
         
-    # Sắp xếp danh sách giáo viên.
-    # Python sẽ tự động dùng phương thức __lt__ ta đã định nghĩa để biết cách sắp xếp
     danh_sach_giao_vien.sort()
     
-    print("\n--- DANH SÁCH GIÁO VIÊN SAU KHI SẮP XẾP TĂNG DẦN THEO SỐ NĂM CÔNG TÁC ---")
-    # In ra màn hình
+    print("\n--- DANH SÁCH GIÁO VIÊN SAU KHI SẮP XẾP ---")
     for gv in danh_sach_giao_vien:
-        print(gv) # Tự động gọi phương thức __str__
+        print(gv)
         
-    # Ghi kết quả vào file GIAOVIEN.TXT
     try:
         with open("GIAOVIEN.TXT", "w", encoding="utf-8") as f:
-            f.write("DANH SÁCH GIÁO VIÊN SAU KHI SẮP XẾP\n")
+            f.write("DANH SÁCH GIÁO VIÊN SẮP XẾP THEO SỐ NĂM CÔNG TÁC\n")
             f.write("-" * 30 + "\n")
             for gv in danh_sach_giao_vien:
-                # Ghi chuỗi trả về từ __str__ vào file, cộng thêm dấu xuống dòng
                 f.write(str(gv) + "\n")
         print("\nĐã ghi thành công kết quả vào file GIAOVIEN.TXT")
     except IOError:
